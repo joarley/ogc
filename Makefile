@@ -158,7 +158,7 @@ MADOBJ		:=	mp3player.o bit.o decoder.o fixed.o frame.o huffman.o \
 #---------------------------------------------------------------------------------
 DBOBJ		:=	uip_ip.o uip_tcp.o uip_pbuf.o uip_netif.o uip_arp.o uip_arch.o \
 				uip_icmp.o memb.o memr.o bba.o tcpip.o debug.o debug_handler.o \
-				debug_supp.o geckousb.o
+				debug_supp.o geckousb.o helper_tcpip.o
 #---------------------------------------------------------------------------------
 DIOBJ		:=	di.o
 

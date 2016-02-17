@@ -614,6 +614,10 @@ void _break(void)
 						   __breakinst: .long 0x7d821008");
 }
 
+void helper_tcpip_preinit( s32 device_type, s32 port );
+
+struct dbginterface *helper_tcpip_init( s32 port );
+
 void DEBUG_Init(s32 device_type,s32 channel_port)
 {
 	u32 level;
@@ -621,18 +625,24 @@ void DEBUG_Init(s32 device_type,s32 channel_port)
 
 	UIP_LOG("DEBUG_Init()\n");
 
+	if ( device_type==100 || device_type==101 ) {
+		helper_tcpip_preinit( device_type, channel_port);
+	}
+
 	__lwp_thread_dispatchdisable();
 
 	bp_init();
 
 	if(device_type==GDBSTUB_DEVICE_USB) {
 		current_device = usb_init(channel_port);
-	} else {
+	} else if ( device_type==GDBSTUB_DEVICE_TCP) {
 		localip.addr = uip_ipaddr((const u8_t*)tcp_localip);
 		netmask.addr = uip_ipaddr((const u8_t*)tcp_netmask);
 		gateway.addr = uip_ipaddr((const u8_t*)tcp_gateway);
 
 		current_device = tcpip_init(&localip,&netmask,&gateway,(u16)channel_port);
+	} else {
+		current_device = helper_tcpip_init(channel_port);
 	}
 
 	if(current_device!=NULL) {
