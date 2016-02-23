@@ -46,7 +46,7 @@ distribution.
 
 #define ROUNDDOWN32(v)				(((u32)(v)-0x1f)&~0x1f)
 
-#define	HEAP_SIZE					(18*1024)
+#define	HEAP_SIZE					(288*1024)
 #define	TAG_START					0x0BADC0DE
 
 #define	CBW_SIZE					31
@@ -99,6 +99,11 @@ static bool __inited = false;
 static u64 usb_last_used = 0;
 static lwpq_t __usbstorage_waitq = 0;
 static u32 usbtimeout = USBSTORAGE_TIMEOUT;
+
+
+#define __lwp_heap_init(theheap,start_addr,size,pg_size) __lwp_heap_init(theheap,start_addr,size,pg_size); printf("Iniciando head, tamanho: %d, line: %d", size, __LINE__)
+#define __lwp_heap_allocate(theheap, size) __lwp_heap_allocate(theheap, size); printf("usando head, tamanho: %d, local: %d", size, __LINE__)
+#define __lwp_heap_free(__heap, max_lun) __lwp_heap_free(__heap, max_lun);  printf("liberando head, local: %d", __LINE__)
 
 /*
 The following is for implementing a DISC_INTERFACE
@@ -736,7 +741,10 @@ s32 USBStorage_Read(usbstorage_handle *dev, u8 lun, u32 sector, u16 n_sectors, u
 	};
 
 	if(lun >= dev->max_lun || dev->sector_size[lun] == 0)
+	{
+		printf("lun: %d, max_lun: %d, sector_size: %d", (int)lun, (int)dev->max_lun, (int)dev->sector_size[lun]);
 		return IPC_EINVAL;
+	}
 
 	// more than 60s since last use - make sure drive is awake
 	if(ticks_to_secs(gettime() - usb_last_used) > 60)
